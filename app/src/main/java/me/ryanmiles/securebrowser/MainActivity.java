@@ -39,4 +39,11 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d(TAG,Data.TABOUTLIST.toString());
+        Data.TABOUTLIST.clear();
+    }
 }

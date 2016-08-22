@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -13,6 +14,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
+import me.ryanmiles.securebrowser.BuildConfig;
 import me.ryanmiles.securebrowser.R;
 import me.ryanmiles.securebrowser.events.OpenWebViewFragment;
 
@@ -40,4 +43,10 @@ public class SetupFragment extends Fragment {
         String link = mMaterialEditText.getText().toString();
         EventBus.getDefault().post(new OpenWebViewFragment(link));
     }
+    @OnLongClick(R.id.openLink)
+    public boolean showDebug(){
+        Toast.makeText(getActivity(), "Debug - Name: " + BuildConfig.VERSION_NAME + " Number: " + BuildConfig.VERSION_CODE, Toast.LENGTH_LONG).show();
+        return true;
+    }
+
 }

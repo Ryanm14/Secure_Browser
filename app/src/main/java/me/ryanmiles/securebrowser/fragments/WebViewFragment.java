@@ -3,16 +3,18 @@ package me.ryanmiles.securebrowser.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.ryanmiles.securebrowser.Data;
 import me.ryanmiles.securebrowser.R;
+import me.ryanmiles.securebrowser.model.TabOut;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,7 +23,9 @@ import me.ryanmiles.securebrowser.R;
  */
 public class WebViewFragment extends Fragment {
     private static final String ARG_LINK = "link";
+    private static final String TAG = WebViewFragment.class.getCanonicalName();
     private String mLink;
+    private long startTabOutTime = 0;
 
     @BindView(R.id.webview)
     WebView mWebView;
@@ -62,6 +66,18 @@ public class WebViewFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Toast.makeText(getActivity(), "Exited Out!", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "onPause() called with: " + "");
+        startTabOutTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        long endTabOutTime = System.currentTimeMillis();
+        if(startTabOutTime != 0){
+            Log.d(TAG,"Added new Tab");
+            Data.TABOUTLIST.add(new TabOut(startTabOutTime, endTabOutTime));
+            startTabOutTime = 0;
+        }
     }
 }

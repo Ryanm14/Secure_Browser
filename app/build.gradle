@@ -6,13 +6,39 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
 
+    def versionPropsFile = file('version.properties')
+    def versionBuild
+
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        versionBuild = versionProps['VERSION_BUILD'].toInteger()
+    } else {
+        throw new GradleException("Could not read version.properties!")
+    }
+
+    ext.autoIncrementBuildNumber = {
+
+        if (versionPropsFile.canRead()) {
+            def Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionPropsFile))
+            versionBuild = versionProps['VERSION_BUILD'].toInteger() + 1
+            versionProps['VERSION_BUILD'] = versionBuild.toString()
+            versionProps.store(versionPropsFile.newWriter(), null)
+        } else {
+            throw new GradleException("Could not read version.properties!")
+        }
+    }
+
+
     defaultConfig {
         applicationId "me.ryanmiles.securebrowser"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode versionBuild
+        versionName "1.0.0." + versionBuild
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -22,13 +48,22 @@ android {
 
     testfairyConfig {
         apiKey "87d813841bd995c4967546d2eff02869b47c613a"
+        autoUpdate true
+    }
+
+    assembleDebug << {
+        autoIncrementBuildNumber()
+    }
+
+    /* auto increment build number for Release build*/
+    assembleRelease << {
+        autoIncrementBuildNumber()
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'testfairy:testfairy-android-sdk:1.+@aar'
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
     compile 'com.android.support:appcompat-v7:24.1.1'
