@@ -7,6 +7,7 @@ public class TabOut {
     private long startTime;
     private long endTime;
     private double duration;
+    private String severity;
 
     public TabOut() {
     }
@@ -15,6 +16,17 @@ public class TabOut {
         this.startTime = startTime;
         this.endTime = end_time;
         calcDuration();
+        calcSeverity();
+    }
+
+    private void calcSeverity() {
+        if (duration >= 5) {
+            severity = "High";
+        } else if (duration >= 1.2) {
+            severity = "Medium";
+        } else {
+            severity = "Low";
+        }
     }
 
     public long getStartTime() {
@@ -41,7 +53,7 @@ public class TabOut {
         this.duration = duration;
     }
 
-    public void calcDuration(){
+    public void calcDuration() {
         duration = (double) (endTime - startTime) / 1000;
     }
 
@@ -50,5 +62,9 @@ public class TabOut {
         return "TabOut{" +
                 "duration=" + duration +
                 '}';
+    }
+
+    public String getSeverity() {
+        return severity;
     }
 }

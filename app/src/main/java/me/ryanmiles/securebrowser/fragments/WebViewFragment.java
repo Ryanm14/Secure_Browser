@@ -24,11 +24,10 @@ import me.ryanmiles.securebrowser.model.TabOut;
 public class WebViewFragment extends Fragment {
     private static final String ARG_LINK = "link";
     private static final String TAG = WebViewFragment.class.getCanonicalName();
-    private String mLink;
-    private long startTabOutTime = 0;
-
     @BindView(R.id.webview)
     WebView mWebView;
+    private String mLink;
+    private long startTabOutTime = 0;
 
 
     public WebViewFragment() {
@@ -66,7 +65,7 @@ public class WebViewFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause() called with: " + "");
+        Log.d(TAG, "onPause() called" + "");
         startTabOutTime = System.currentTimeMillis();
     }
 

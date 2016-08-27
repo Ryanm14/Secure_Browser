@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:layout_margin="20dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <CheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:checked="true"
+        android:text="Qr Reader" />
+
+    <com.dlazaro66.qrcodereaderview.QRCodeReaderView
+        android:id="@+id/qrdecoderview"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_gravity="center_horizontal" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/link_edit_text"
-        android:hint="Link"
-        android:text="http://google.com"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Link" />
     <Button
+        android:id="@+id/openLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/openLink"
         android:text="Open"/>
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/email_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Link"
+        android:text="ryanm1114@gmail.com" />
 
 </LinearLayout>
