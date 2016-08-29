@@ -1,13 +1,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/webviewlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="me.ryanmiles.securebrowser.fragments.WebViewFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <WebView
+    <me.ryanmiles.securebrowser.ObservableWebView
+        android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/webview"/>
+        android:layout_height="match_parent" />
 
 </FrameLayout>

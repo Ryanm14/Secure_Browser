@@ -14,13 +14,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import me.ryanmiles.securebrowser.events.BackPress;
 import me.ryanmiles.securebrowser.events.OpenWebViewFragment;
 import me.ryanmiles.securebrowser.events.SavedStudentInfo;
 import me.ryanmiles.securebrowser.fragments.SetupFragment;
@@ -28,6 +28,7 @@ import me.ryanmiles.securebrowser.fragments.StudentInfoFragment;
 import me.ryanmiles.securebrowser.fragments.WebViewFragment;
 import me.ryanmiles.securebrowser.model.TabOut;
 
+import static me.ryanmiles.securebrowser.Data.EMAIL_ADDRESS;
 import static me.ryanmiles.securebrowser.Data.FIRST_NAME;
 import static me.ryanmiles.securebrowser.Data.LAST_NAME;
 import static me.ryanmiles.securebrowser.Data.SHAREDPREF_FIRST_NAME_KEY;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSION_ALL = 1;
     private static final String TAG = MainActivity.class.getCanonicalName();
-    public static String address = "";
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
@@ -129,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Subscribe
+    public void onEvent(BackPress event) {
+        onBackPressed();
+    }
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -147,13 +153,12 @@ public class MainActivity extends AppCompatActivity {
             BackgroundMail.newBuilder(this)
                     .withUsername("ryanm934@millcreekhs.com")
                     .withPassword("newman14")
-                    .withMailto(address)
-                    .withSubject(subject + " Tab out Report for Ryan Miles")
-                    .withBody("Tabout out report for Ryan Miles (200224934): \n" + body)
+                    .withMailto(EMAIL_ADDRESS)
+                    .withSubject(subject + " Tab out Report for " + FIRST_NAME + " " + LAST_NAME)
+                    .withBody("Tabout out report for " + FIRST_NAME + " " + LAST_NAME + " (" + STUDENT_ID + "): \n" + body)
                     .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
                         @Override
                         public void onSuccess() {
-                            Toast.makeText(MainActivity.this, "Sent Email!", Toast.LENGTH_LONG).show();
                         }
                     })
                     .withOnFailCallback(new BackgroundMail.OnFailCallback() {
