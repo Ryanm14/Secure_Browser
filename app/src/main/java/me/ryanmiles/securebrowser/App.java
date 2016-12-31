@@ -3,7 +3,11 @@ package me.ryanmiles.securebrowser;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.ArrayList;
+
+import io.fabric.sdk.android.Fabric;
 
 import static me.ryanmiles.securebrowser.Data.FIRST_NAME;
 import static me.ryanmiles.securebrowser.Data.LAST_NAME;
@@ -19,6 +23,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         Data.TABOUTLIST = new ArrayList<>();
         SharedPreferences prefs = getSharedPreferences("me.ryanmiles.securebrowser", MODE_PRIVATE);
         FIRST_NAME = prefs.getString(SHAREDPREF_FIRST_NAME_KEY, null);

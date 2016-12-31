@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -14,11 +15,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import me.ryanmiles.securebrowser.events.BackPress;
 import me.ryanmiles.securebrowser.events.OpenWebViewFragment;
@@ -28,12 +40,12 @@ import me.ryanmiles.securebrowser.fragments.StudentInfoFragment;
 import me.ryanmiles.securebrowser.fragments.WebViewFragment;
 import me.ryanmiles.securebrowser.model.TabOut;
 
-import static me.ryanmiles.securebrowser.Data.EMAIL_ADDRESS;
 import static me.ryanmiles.securebrowser.Data.FIRST_NAME;
 import static me.ryanmiles.securebrowser.Data.LAST_NAME;
 import static me.ryanmiles.securebrowser.Data.SHAREDPREF_FIRST_NAME_KEY;
 import static me.ryanmiles.securebrowser.Data.SHAREDPREF_LAST_NAME_KEY;
 import static me.ryanmiles.securebrowser.Data.SHAREDPREF_STUDENT_ID_KEY;
+import static me.ryanmiles.securebrowser.Data.START_TIME;
 import static me.ryanmiles.securebrowser.Data.STUDENT_ID;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,6 +62,94 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    public static String POST() {
+        InputStream inputStream = null;
+        String result = "";
+        String url = "https://gwinnett-county-browser-ryanm14.c9users.io/tests";
+        double test_duration = (double) (System.currentTimeMillis() - START_TIME) / 1000;
+        try {
+
+            // 1. create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+
+            // 2. make POST request to the given URL
+            HttpPost httpPost = new HttpPost(url);
+
+            String json = "";
+
+            // 3. build jsonObject
+            JSONObject mainJsonObject = new JSONObject();
+
+            JSONObject studentJsonObject = new JSONObject();
+            JSONArray arrayForStudent = new JSONArray();
+            studentJsonObject.accumulate("teacher_first_name", "Greg");
+            studentJsonObject.accumulate("teacher_last_name", "Marr");
+            studentJsonObject.accumulate("student_first_name", FIRST_NAME);
+            studentJsonObject.accumulate("student_last_name", LAST_NAME);
+            studentJsonObject.accumulate("severity", "High");
+            studentJsonObject.accumulate("test_duration", test_duration);
+            arrayForStudent.put(studentJsonObject);
+
+
+            JSONArray arrayForLengths = new JSONArray();
+            for (TabOut tabOut : Data.TABOUTLIST) {
+                JSONObject itemLength = new JSONObject();
+                itemLength.put("length", tabOut.getDuration());
+                arrayForLengths.put(itemLength);
+            }
+
+            mainJsonObject.put("test", arrayForStudent.get(0));
+            mainJsonObject.put("tab_outs", arrayForLengths);
+
+            // 4. convert JSONObject to JSON to String
+            json = mainJsonObject.toString();
+            Log.d("POST[Tests]: ", json);
+            // ** Alternative way to convert Person object to JSON string usin Jackson Lib
+            // ObjectMapper mapper = new ObjectMapper();
+            // json = mapper.writeValueAsString(person);
+
+            // 5. set json to StringEntity
+            StringEntity se = new StringEntity(json);
+
+            // 6. set httpPost Entity
+            httpPost.setEntity(se);
+
+            // 7. Set some headers to inform server about the type of the content
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+
+            // 8. Execute POST request to the given URL
+            HttpResponse httpResponse = httpclient.execute(httpPost);
+
+            // 9. receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+
+            // 10. convert inputstream to string
+            if (inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+
+        } catch (Exception e) {
+            Log.d("InputStream", e.getLocalizedMessage());
+        }
+
+        // 11. return result
+        return result;
+    }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while ((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+
     }
 
     @Override
@@ -78,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "onEvent() called with: " + "event = [" + event + "]");
         WebViewFragment webViewFragment = WebViewFragment.newInstance(event.getLink());
         FragmentManager trans = getSupportFragmentManager();
+        START_TIME = System.currentTimeMillis();
         trans.beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .replace(R.id.frame_layout, webViewFragment, "WebView")
@@ -134,43 +235,26 @@ public class MainActivity extends AppCompatActivity {
         onBackPressed();
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (!Data.TABOUTLIST.isEmpty()) {
-            String body = "";
-            String subject = "";
-            for (TabOut tabOut : Data.TABOUTLIST) {
-                body += "\n#" + Data.TABOUTLIST.indexOf(tabOut) + " Tab Out = Duration: " + tabOut.getDuration() + " Severity: " + tabOut.getSeverity();
-                if (tabOut.getSeverity().equals("High")) {
-                    subject = "[High]";
-                }
-            }
-            if (subject.equals("")) {
-                subject = "Low / Medium";
-            }
-            BackgroundMail.newBuilder(this)
-                    .withUsername("ryanm934@millcreekhs.com")
-                    .withPassword("newman14")
-                    .withMailto(EMAIL_ADDRESS)
-                    .withSubject(subject + " Tab out Report for " + FIRST_NAME + " " + LAST_NAME)
-                    .withBody("Tabout out report for " + FIRST_NAME + " " + LAST_NAME + " (" + STUDENT_ID + "): \n" + body)
-                    .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                        @Override
-                        public void onSuccess() {
-                        }
-                    })
-                    .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                        @Override
-                        public void onFail() {
-                            //do some magic
-                        }
-                    })
-                    .send();
+        Log.d(TAG, Data.TABOUTLIST.toString());
+        new HttpAsyncTask().execute();
+
         }
-        Log.d(TAG,Data.TABOUTLIST.toString());
-        Data.TABOUTLIST.clear();
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            return POST();
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(getBaseContext(), "Data Sent!", Toast.LENGTH_LONG).show();
+            Data.TABOUTLIST.clear();
+        }
     }
 
 }

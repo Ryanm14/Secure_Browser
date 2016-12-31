@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import me.ryanmiles.securebrowser.BuildConfig;
+import me.ryanmiles.securebrowser.Data;
 import me.ryanmiles.securebrowser.R;
 import me.ryanmiles.securebrowser.events.OpenWebViewFragment;
 
@@ -85,6 +86,8 @@ public class SetupFragment extends Fragment implements OnQRCodeReadListener {
             if (!link.startsWith("http://") && !link.startsWith("https://")) {
                 link = "http://" + link;
             }
+            Data.START_TIME = System.currentTimeMillis();
+            Data.temp = true;
             EventBus.getDefault().post(new OpenWebViewFragment(link));
         }
     }

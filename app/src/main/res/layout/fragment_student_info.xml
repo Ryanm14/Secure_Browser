@@ -18,7 +18,7 @@
         android:id="@+id/student_last_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Last Number"
+        android:hint="Last Name"
         android:inputType="textPersonName" />
 
     <com.rengwuxian.materialedittext.MaterialEditText

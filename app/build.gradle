@@ -1,11 +1,26 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 apply plugin: 'android-apt'
 apply plugin: 'testfairy'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
+    useLibrary 'org.apache.http.legacy'
     def versionPropsFile = file('version.properties')
     def versionBuild
 
@@ -51,14 +66,7 @@ android {
         autoUpdate true
     }
 
-    assembleDebug << {
-        autoIncrementBuildNumber()
-    }
 
-    /* auto increment build number for Release build*/
-    assembleRelease << {
-        autoIncrementBuildNumber()
-    }
 }
 
 dependencies {
@@ -74,5 +82,8 @@ dependencies {
     compile 'com.github.yesidlazaro:GmailBackground:1.1'
     compile('com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.0@aar') {
         transitive = true
+    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+        transitive = true;
     }
 }

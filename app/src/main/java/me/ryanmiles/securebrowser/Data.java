@@ -18,12 +18,14 @@ public class Data {
     public static LinkedHashMap<String, String> EMAIL_LIST = new LinkedHashMap<String, String>() {{
         put("Select Teacher", "");
         put("Miles, Ryan", "ryanm1114@gmail.com");
-        put("Vamplew, Ryan", "Ryan_vamplew@gwinnett.k12.ga.us");
+        // put("Vamplew, Ryan", "Ryan_vamplew@gwinnett.k12.ga.us");
         put("Rutledge, Abby", "Abby_Rutledge@gwinnett.k12.ga.us");
     }};
     public static String FIRST_NAME;
     public static String LAST_NAME;
     public static int STUDENT_ID;
+    public static long START_TIME;
+    public static boolean temp;
 
 
 }

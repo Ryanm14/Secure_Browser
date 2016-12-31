@@ -12,13 +12,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:checked="true"
-        android:text="Qr Reader" />
+        android:text="Qr Reader"
+        android:visibility="gone" />
 
     <com.dlazaro66.qrcodereaderview.QRCodeReaderView
         android:id="@+id/qrdecoderview"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/link_edit_text"
