@@ -17,6 +17,9 @@ import com.dlazaro66.qrcodereaderview.QRCodeReaderView.OnQRCodeReadListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,6 @@ import me.ryanmiles.securebrowser.BuildConfig;
 import me.ryanmiles.securebrowser.Data;
 import me.ryanmiles.securebrowser.R;
 import me.ryanmiles.securebrowser.events.OpenWebViewFragment;
-
-import static me.ryanmiles.securebrowser.Data.EMAIL_ADDRESS;
-import static me.ryanmiles.securebrowser.Data.EMAIL_LIST;
 
 /**
  * Created by Ryan Miles on 8/13/2016.
@@ -48,6 +48,9 @@ public class SetupFragment extends Fragment implements OnQRCodeReadListener {
     QRCodeReaderView qrCodeReaderView;
     @BindView(R.id.checkbox)
     CheckBox checkBox;
+
+    ArrayList<String> names = new ArrayList<>();
+
     public SetupFragment(){
     }
 
@@ -58,8 +61,7 @@ public class SetupFragment extends Fragment implements OnQRCodeReadListener {
         ButterKnife.bind(this,rootView);
         qrCodeReaderView.setOnQRCodeReadListener(this);
         qrCodeReaderView.setAutofocusInterval(2000L);
-        List<String> address_name = new ArrayList<>(EMAIL_LIST.keySet());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, address_name);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, getTeacherNames());
         mAddressSpinner.setAdapter(adapter);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,19 +75,21 @@ public class SetupFragment extends Fragment implements OnQRCodeReadListener {
         });
         return rootView;
     }
+
     @OnClick(R.id.openLink)
-    public void openLink(){
+    public void openLink() {
         String link = mLinkEditText.getText().toString();
         int spinner_postion = mAddressSpinner.getSelectedItemPosition();
-        List<String> indexes = new ArrayList<>(EMAIL_LIST.values());
-        String address = indexes.get(spinner_postion);
-        if (link.equals("") || address.equals("")) {
+        String teacherName = names.get(spinner_postion);
+
+        if (link.equals("") || teacherName.equals("")) {
             Toast.makeText(getActivity(), "Make sure the fields are not blank!", Toast.LENGTH_LONG).show();
         } else {
-            EMAIL_ADDRESS = address;
+            setTeacherName(teacherName);
             if (!link.startsWith("http://") && !link.startsWith("https://")) {
                 link = "http://" + link;
             }
+            names.clear();
             Data.START_TIME = System.currentTimeMillis();
             Data.temp = true;
             EventBus.getDefault().post(new OpenWebViewFragment(link));
@@ -116,5 +120,24 @@ public class SetupFragment extends Fragment implements OnQRCodeReadListener {
     }
 
 
+    public List<String> getTeacherNames() {
+        names.add("Select Teacher");
+        try {
+            JSONArray items = new JSONArray(Data.TeacherJson);
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject jObj = null;
+                jObj = items.getJSONObject(i);
+                names.add(jObj.getString("first_name") + ", " + jObj.getString("last_name"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return names;
+    }
 
+    public void setTeacherName(String teacherName) {
+        String[] parts = teacherName.split("\\, ");
+        Data.TEACHER_FIRST_NAME = parts[0];
+        Data.TEACHER_LAST_NAME = parts[1];
+    }
 }

@@ -21,8 +21,11 @@ public class Data {
         // put("Vamplew, Ryan", "Ryan_vamplew@gwinnett.k12.ga.us");
         put("Rutledge, Abby", "Abby_Rutledge@gwinnett.k12.ga.us");
     }};
+    public static String TeacherJson;
     public static String FIRST_NAME;
     public static String LAST_NAME;
+    public static String TEACHER_FIRST_NAME;
+    public static String TEACHER_LAST_NAME;
     public static int STUDENT_ID;
     public static long START_TIME;
     public static boolean temp;

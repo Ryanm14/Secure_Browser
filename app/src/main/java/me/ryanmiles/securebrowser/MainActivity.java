@@ -47,11 +47,14 @@ import static me.ryanmiles.securebrowser.Data.SHAREDPREF_LAST_NAME_KEY;
 import static me.ryanmiles.securebrowser.Data.SHAREDPREF_STUDENT_ID_KEY;
 import static me.ryanmiles.securebrowser.Data.START_TIME;
 import static me.ryanmiles.securebrowser.Data.STUDENT_ID;
+import static me.ryanmiles.securebrowser.Data.TEACHER_FIRST_NAME;
+import static me.ryanmiles.securebrowser.Data.TEACHER_LAST_NAME;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int PERMISSION_ALL = 1;
     private static final String TAG = MainActivity.class.getCanonicalName();
+    private static String severity;
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
@@ -80,15 +83,17 @@ public class MainActivity extends AppCompatActivity {
             String json = "";
 
             // 3. build jsonObject
+            String severity = getSeverity();
+
             JSONObject mainJsonObject = new JSONObject();
 
             JSONObject studentJsonObject = new JSONObject();
             JSONArray arrayForStudent = new JSONArray();
-            studentJsonObject.accumulate("teacher_first_name", "Greg");
-            studentJsonObject.accumulate("teacher_last_name", "Marr");
+            studentJsonObject.accumulate("teacher_first_name", TEACHER_FIRST_NAME);
+            studentJsonObject.accumulate("teacher_last_name", TEACHER_LAST_NAME);
             studentJsonObject.accumulate("student_first_name", FIRST_NAME);
             studentJsonObject.accumulate("student_last_name", LAST_NAME);
-            studentJsonObject.accumulate("severity", "High");
+            studentJsonObject.accumulate("severity", severity);
             studentJsonObject.accumulate("test_duration", test_duration);
             arrayForStudent.put(studentJsonObject);
 
@@ -150,6 +155,22 @@ public class MainActivity extends AppCompatActivity {
         inputStream.close();
         return result;
 
+    }
+
+    public static String getSeverity() {
+        int total = 0;
+        for (TabOut tabOut : Data.TABOUTLIST) {
+            total += tabOut.getSeverity_point();
+        }
+        if (total >= 8) {
+            return "danger";
+        } else if (total >= 2) {
+            return "warning";
+        } else if (total >= 1.25) {
+            return "info";
+        } else {
+            return "success";
+        }
     }
 
     @Override

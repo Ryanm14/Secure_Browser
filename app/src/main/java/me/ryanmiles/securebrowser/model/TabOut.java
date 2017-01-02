@@ -7,7 +7,7 @@ public class TabOut {
     private long startTime;
     private long endTime;
     private double duration;
-    private String severity;
+    private double severity_point;
 
     public TabOut() {
     }
@@ -20,12 +20,15 @@ public class TabOut {
     }
 
     private void calcSeverity() {
-        if (duration >= 5) {
-            severity = "High";
+
+        if (duration >= 15) {
+            severity_point = 10;
+        } else if (duration >= 5) {
+            severity_point = 2;
         } else if (duration >= 1.2) {
-            severity = "Medium";
+            severity_point = .25;
         } else {
-            severity = "Low";
+            severity_point = 0;
         }
     }
 
@@ -64,7 +67,7 @@ public class TabOut {
                 '}';
     }
 
-    public String getSeverity() {
-        return severity;
+    public double getSeverity_point() {
+        return severity_point;
     }
 }
